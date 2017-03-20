@@ -7,6 +7,14 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Shane Lacey <shanel262@hotmail.com> (https://github.com/shanel262)",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "errorhandler": "^1.5.0",
+    "express": "^4.15.2",
+    "express-validator": "^3.1.2",
+    "lodash": "^4.17.4",
+    "mongoose": "^4.9.1",
+    "morgan": "^1.8.1"
+  }
 }
-
