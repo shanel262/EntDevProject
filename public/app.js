@@ -29,7 +29,7 @@ entDev.config(['$routeProvider',
 
 // .run(function($rootScope, $location){
 // 	$rootScope.$on('$routeChangeStart', function(event, nextRoute, currentRoute){
-// 		console.log('LOGGED IN USER:', $rootScope.loggedInUser.username)
+// 		console.log('LOGGED IN USER:', $rootScope.loggedInUser)
 // 		console.log('NEXTROUTE:', $location.path())
 // 		// console.log('CURRENTROUTE:', currentRoute.$$route.originalPath)
 // 		if($rootScope.loggedInUser == null){
@@ -52,9 +52,11 @@ entDev.controller('HomeController', ["$scope", "HomeService", "$rootScope", func
 	}
 	$scope.modules = []
 	function getModules(){
-		HomeService.getModules($rootScope.loggedInUser.id).then(function(res){
-			$scope.modules = res.data
-		})
+		if($rootScope.loggedInUser){
+			HomeService.getModules($rootScope.loggedInUser.id).then(function(res){
+				$scope.modules = res.data
+			})			
+		}
 	}
 	getModules()
 }])
@@ -182,9 +184,16 @@ entDev.factory('AddModuleService', ["$location", "$http", function($location, $h
 //Module
 entDev.controller('ModuleController', ["$scope", "ModuleService", "AddSectionService","$rootScope", "$routeParams", function($scope, ModuleService, AddSectionService,$rootScope, $routeParams){
 	$rootScope.failed = false
+	$scope.sections = []
 	ModuleService.getModuleTopics($routeParams._id).then(function(res){
 		$scope.name = res.data.name
 		$scope.id = res.data._id
+		for(var i = 0; i < res.data.sections.length; i++){
+			ModuleService.getSection(res.data.sections[i]._id).then(function(res){
+				console.log('RES:', res)
+				$scope.sections.push(res.data)
+			})
+		}
 	})
 	$scope.addSection = function(){
 		$scope.section.moduleId = $routeParams._id
@@ -200,11 +209,26 @@ entDev.factory('ModuleService', ["$location", "$http", function($location, $http
 				url: '/api/modules/getModule/' + moduleId
 			})
 			.success(function(res){
-				console.log('Successful retrieval;', res)
+				console.log('Successful retrieval:', res)
 				return res
 			})
 			.error(function(res){
 				console.log('Failed retrieval:', res)
+				return res
+			})
+		},
+		getSection: function(_id){
+			console.log('GET SECTION', _id)
+			return $http({
+				method: 'GET',
+				url: '/api/sections/getSection/' + _id
+			})
+			.success(function(res){
+				console.log('Successfully retrieved section:', res)
+				return res
+			})
+			.error(function(res){
+				console.log('Failed to retrieve section:', res)
 				return res
 			})
 		}

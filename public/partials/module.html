@@ -5,8 +5,16 @@
 				<div class="panel-heading" style="text-align: center;">
 					<h3>{{name}}</h3><a href="#/module/{{id}}/addSection" class="btn btn-success btn-sm">Add Section</a>
 				</div>
-				<div class="panel-body">
-					Sections
+				<div class="panel-body" ng-repeat="section in sections">
+					<h3>{{section.name}}</h3>
+					<label>{{section.description}}</label>
+					<ol>
+						<li>Content 1</li>
+						<li>Content 2</li>
+					</ol>
+				</div>
+				<div class="panel-body" ng-show="sections.length == 0">
+					No sections
 				</div>
 			</div>
 		</div>

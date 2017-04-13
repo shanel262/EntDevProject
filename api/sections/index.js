@@ -3,7 +3,7 @@ var controller = require('./section.controller');
 
 var router = express.Router();
 
-// router.get('/getModules/:userId', controller.getModules); //Get modules for a user
+router.get('/getSection/:sectionId', controller.getSection); //Get modules for a user
 // router.post('/register', controller.register); //Register a user
 
 module.exports = router;
