@@ -6,18 +6,24 @@
         <div class="panel-body">
           <form ng-submit="register()">
             <div class="form-group">
-              <input type="text" ng-model="user.name" name="name" placeholder="Name" class="form-control" required><br>
-            </div>
-            <div class="form-group">
-              <input type="text" ng-model="user.username" name="username" placeholder="Username" class="form-control" required><br>
-            </div>
-            <div class="form-group">
-              <input type="password" ng-model="user.password" name="password" placeholder="Password" class="form-control" required><br>
+              <label>Name:</label>
+              <input type="text" ng-model="user.name" name="name" class="form-control" required><br>
+              <label>Username:</label>
+              <input type="text" ng-model="user.username" name="username" class="form-control" required><br>
+              <label>Password:</label>
+              <input type="password" ng-model="user.password" name="password" class="form-control" required><br>
+              <label>Role:</label><br>
+              <select ng-model="user.role" ng-options="x for x in roles" required>
+                <option></option>
+              </select>
             </div>
             <button type="submit" class="btn btn-success">Submit</button>
           </form>
           <br>
           <a href="#/login">Already have an account? Login</a>
+          <div class="alert alert-danger" ng-show="failed == true">
+              Registration has failed
+           </div>
         </div>
       </div>
     </div>

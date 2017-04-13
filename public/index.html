@@ -4,8 +4,11 @@
   <meta charset="utf-8">
   <title>Enterprise Development</title>
   <script type="text/javascript" src="../scripts/angular.min.js"></script>
-  <script type="text/javascript" src="../scripts/angular-route.min.js"></script> 
-  <link href="styles/bootstrap.min.css" rel="stylesheet">
+  <script type="text/javascript" src="../scripts/angular-route.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!-- <link href="styles/bootstrap.min.css" rel="stylesheet"> -->
   <!-- <link href="css/custom.css" rel="stylesheet" type="text/css"> -->
 
 </head>
@@ -20,6 +23,7 @@
         <li><a href="#/home">Home</a></li>
         <li><a href="#/login">Login</a></li>
         <li><a href="#/register">Register</a></li>
+        <li><a ng-click="logout()" ng-show="loggedInUser != null">Logout</a></li>
     </div>
   </div>
 </nav>

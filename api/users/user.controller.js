@@ -1,9 +1,9 @@
 var User = require('./user.model');
 
 
-function handleError(err) {
+function handleError(res, err) {
   console.log(err);
-  return res.send(500, err);
+  return res.status(500).json(err);
 }
 
 // Login user
@@ -11,7 +11,11 @@ exports.login = function(req, res){
 	console.log('IN LOGIN API:', req.body.username)
 	User.findOne({username: req.body.username}, 
 		function(err, user){
-			if(err){handleError(err)}
+			if(err){handleError(res, err)}
+			if(!user){
+				console.log('USER NOT FOUND:')
+				return res.status(404).send("User not found")
+			}
 			else{
 				console.log('USER EXISTS:', user)
 				if(user.password === req.body.password){
@@ -30,10 +34,11 @@ exports.register = function(req, res){
 	var user = {
 		name: req.body.name,
 		username: req.body.username,
-		password: req.body.password
+		password: req.body.password,
+		role: req.body.role
 	}
 	User.create(user, function(err, user){
-		if(err){handleError(err)}
+		if(err){handleError(res, err)}
 		else{
 			console.log('User created:', user)
 			return res.status(201).json(user)
