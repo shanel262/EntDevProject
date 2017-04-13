@@ -18,30 +18,50 @@ entDev.config(['$routeProvider',
 	}
 ])
 
-.run(function($rootScope, $location){
-	$rootScope.$on('$routeChangeStart', function(event, nextRoute, currentRoute){
-		console.log('LOGGED IN USER:', $rootScope.loggedInUser)
-		console.log('NEXTROUTE:', $location.path())
-		// console.log('CURRENTROUTE:', currentRoute.$$route.originalPath)
-		if($rootScope.loggedInUser == null){
-			if($location.path() != '/register'){
-				if($location.path() != '/login'){
-					$location.path('/login')
-				}
-			}
-		}
-	})
-})
+// .run(function($rootScope, $location){
+// 	$rootScope.$on('$routeChangeStart', function(event, nextRoute, currentRoute){
+// 		console.log('LOGGED IN USER:', $rootScope.loggedInUser)
+// 		console.log('NEXTROUTE:', $location.path())
+// 		// console.log('CURRENTROUTE:', currentRoute.$$route.originalPath)
+// 		if($rootScope.loggedInUser == null){
+// 			if($location.path() != '/register'){
+// 				if($location.path() != '/login'){
+// 					$location.path('/login')
+// 				}
+// 			}
+// 		}
+// 	})
+// })
 
 //Home
 entDev.controller('HomeController', ["$scope", "HomeService", "$rootScope", function($scope, HomeService, $rootScope){
-	$scope.test = $rootScope.loggedInUser
+	$rootScope.loggedInUser = 'shanel262'
+	function getModules(){
+		HomeService.getModules($rootScope.loggedInUser).then(function(res){
+			console.log('RES:', res)
+		})
+	}
+	getModules()
 }])
 
 entDev.factory('HomeService', ["$location", "$http", function($location, $http){
-	// return {
-		
-	// }
+	return {
+		getModules: function(userId){
+			console.log('GETTING MODULES', userId)
+			return $http({
+				method: 'GET',
+				url: '/api/modules/getModules/' + userId
+			})
+			.success(function(res){
+				console.log('Successful retrieval;', res)
+				return res
+			})
+			.error(function(res){
+				console.log('Failed retrieval:', res)
+				return res
+			})
+		}
+	}
 }])
 
 //Users
