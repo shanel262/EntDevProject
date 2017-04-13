@@ -1,0 +1,23 @@
+<div class="container-fluid" ng-controller="ModuleController">
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2">
+			<div class="panel panel-default">
+				<div class="panel-heading" style="text-align: center;">
+					<b>Add Module</b>
+				</div>
+				<div class="panel-body">
+					<form ng-submit="addModule()">
+						<div class="form-group">
+							<label>Name:</label>
+							<input type="text" name="name" class="form-control" ng-model="module.name" required>
+							<br>
+							<label>Hidden:</label>
+							<input type="checkbox" name="hidden" ng-model="module.hidden">
+						</div>
+						<input type="submit" value="Submit" class="btn btn-md btn-success">
+					</form>
+				</div>			
+			</div>
+		</div>
+	</div>
+</div>

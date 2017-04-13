@@ -2,9 +2,18 @@
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2" ng-controller="HomeController">
 			<div class="panel panel-default">
-				<div class="panel-heading" style="text-align: center;"><b>Modules</b></div>
-				<div class="panel-body">
-					<b>Module</b>
+				<div class="panel-heading" >
+				<div class="col-md-8">
+					
+					<h3 style="text-align: center;">Modules</h3>
+				</div>
+				<div class="col-md-4">
+					<a href="#/addModule" class="btn btn-success btn-sm">Add Module</a>
+					
+				</div>
+				</div>
+				<div class="panel-body" ng-repeat="module in modules">
+					<h2>{{module.name}}</h2>
 				</div>
 			</div>
 		</div>

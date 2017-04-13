@@ -12,6 +12,9 @@ entDev.config(['$routeProvider',
 		.when('/login', {
 			templateUrl: 'partials/login.html'
 		})
+		.when('/addModule', {
+			templateUrl: 'partials/addModule.html'
+		})
 		.otherwise({
 			redirectTo: "/login"
 		})
@@ -20,7 +23,7 @@ entDev.config(['$routeProvider',
 
 // .run(function($rootScope, $location){
 // 	$rootScope.$on('$routeChangeStart', function(event, nextRoute, currentRoute){
-// 		console.log('LOGGED IN USER:', $rootScope.loggedInUser)
+// 		console.log('LOGGED IN USER:', $rootScope.loggedInUser.username)
 // 		console.log('NEXTROUTE:', $location.path())
 // 		// console.log('CURRENTROUTE:', currentRoute.$$route.originalPath)
 // 		if($rootScope.loggedInUser == null){
@@ -35,10 +38,18 @@ entDev.config(['$routeProvider',
 
 //Home
 entDev.controller('HomeController', ["$scope", "HomeService", "$rootScope", function($scope, HomeService, $rootScope){
-	$rootScope.loggedInUser = 'shanel262'
+	$rootScope.loggedInUser = {
+		id: '58ef6387f853ef755eeefa15',
+		name: 'Shane Lacey',
+		username: 'shanel262',
+		role: 'Lecturer'
+	}
+	$scope.modules = []
+	console.log('loggedInUser at home:', $rootScope.loggedInUser)
 	function getModules(){
-		HomeService.getModules($rootScope.loggedInUser).then(function(res){
+		HomeService.getModules($rootScope.loggedInUser.id).then(function(res){
 			console.log('RES:', res)
+			$scope.modules = res.data
 		})
 	}
 	getModules()
@@ -96,7 +107,14 @@ entDev.factory('UsersService', ["$location", "$http", "$rootScope",function($loc
 		})
 		.success(function(res){
 			console.log('LOGIN RES:', res)
-			$rootScope.loggedInUser = res.username
+			$rootScope.loggedInUser = {
+				id: res._id,
+				username: res.username,
+				name: res.name,
+				role: res.name
+			}
+			// $rootScope.loggedInUser = res.username
+			console.log('loggedInUser:', $rootScope.loggedInUser)
 			$rootScope.failed = false
 			$location.path('/home')
 		})
@@ -124,5 +142,39 @@ entDev.factory('UsersService', ["$location", "$http", "$rootScope",function($loc
 	}
 	// return {
 		
+	// }
+}])
+
+//Home
+entDev.controller('ModuleController', ["$scope", "ModuleService", "$rootScope", function($scope, ModuleService, $rootScope){
+	$rootScope.failed = false
+	$scope.addModule = function(){
+		if($scope.module.hidden == undefined){
+			$scope.module.hidden = false
+		}
+		$scope.module.lecturer = $rootScope.loggedInUser.id
+		console.log('ADDING MODULE:', $scope.module)
+		addModule($scope.module)
+	}
+}])
+
+entDev.factory('ModuleService', ["$location", "$http", function($location, $http){
+	addModule = function(module){
+		$http({
+			method: 'POST',
+			url: '/api/modules/addModule',
+			data: module
+		})
+		.success(function(res){
+			console.log('Successfully added:', res)
+			$location.path('/home')
+		})
+		.error(function(res){
+			console.log('Failed to add:', res)
+			$rootScope.failed = true
+		})
+	}
+	// return {
+
 	// }
 }])

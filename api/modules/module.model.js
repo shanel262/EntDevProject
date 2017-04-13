@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 var ModuleSchema = new Schema({
 	name: { type: String, required: true },
 	sections: [Number],
-	lecturers: [Number],
+	lecturer: {type: String, required: true},
 	students: [Number],
 	hidden: Boolean
 });
