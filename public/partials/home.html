@@ -1,20 +1,15 @@
-<div class="container-fluid">
+<div class="container-fluid" ng-controller="HomeController">
 	<div class="row">
-		<div class="col-md-8 col-md-offset-2" ng-controller="HomeController">
+		<div class="col-md-8 col-md-offset-2">
 			<div class="panel panel-default">
-				<div class="panel-heading" >
-				<div class="col-md-8">
-					
-					<h3 style="text-align: center;">Modules</h3>
-				</div>
-				<div class="col-md-4">
-					<a href="#/addModule" class="btn btn-success btn-sm">Add Module</a>
-					
-				</div>
+				<div class="panel-heading" style="text-align: center;">
+					<h3>Modules</h3><a href="#/addModule" class="btn btn-success btn-sm">Add Module</a>
 				</div>
 				<div class="panel-body" ng-repeat="module in modules">
-					<h2>{{module.name}}</h2>
+					<a href="#/module/{{module._id}}"><h2>{{module.name}}</h2></a>
+					<h6 ng-if="module.hidden == true">Hidden module</h6>
 				</div>
 			</div>
 		</div>
+	</div>
 </div>

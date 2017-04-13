@@ -1,5 +1,5 @@
 var Module = require('./module.model');
-
+var Section = require('../sections/section.model')
 
 function handleError(res, err) {
   console.log(err);
@@ -17,6 +17,17 @@ exports.getModules = function(req, res){
 	})
 }
 
+exports.getModule = function(req, res){
+	console.log('getModule API:', req.params.moduleId)
+	Module.findById(req.params.moduleId, function(err, module){
+		if(err){handleError(res, err)}
+		else{
+			console.log('Found module:', module)
+			res.status(200).json(module)
+		}
+	})
+}
+
 exports.addModule = function(req, res){
 	console.log('addModule API:', req.body)
 	var module = {
@@ -29,6 +40,34 @@ exports.addModule = function(req, res){
 		else{
 			console.log('Added module:', module)
 			res.status(201).json(module)
+		}
+	})
+}
+
+exports.addSection = function(req, res){
+	console.log('addSection API:', req.body)
+	var section = {
+		name: req.body.name,
+		description: req.body.description
+	}
+	Section.create(section, function(err, section){
+		if(err){handleError(res, err)}
+		else{
+			console.log('Section created', section)
+			// return res.status(200).json(section)
+			Module.findById(req.body.moduleId, function(err, module){
+				if(err){handleError(res, err)}
+				else{
+					console.log('Found module:', module)
+					var insertSection = {
+						index: module.sections.length,
+						_id: section._id
+					}
+					module.sections.push(insertSection)
+					module.save()
+					res.status(200).json(module)
+				}
+			})
 		}
 	})
 }

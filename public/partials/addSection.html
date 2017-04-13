@@ -1,25 +1,25 @@
-<div class="container-fluid" ng-controller="AddModuleController">
+<div class="container-fluid" ng-controller="ModuleController">
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2">
 			<div class="panel panel-default">
 				<div class="panel-heading" style="text-align: center;">
-					<b>Add Module</b>
+					<b>Add Section</b>
 				</div>
 				<div class="panel-body">
-					<form ng-submit="addModule()">
+					<form ng-submit="addSection()">
 						<div class="form-group">
 							<label>Name:</label>
-							<input type="text" name="name" class="form-control" ng-model="module.name" required>
+							<input type="text" name="name" class="form-control" ng-model="section.name" required>
 							<br>
-							<label>Hidden:</label>
-							<input type="checkbox" name="hidden" ng-model="module.hidden">
+							<label>Description:</label>
+							<input type="text" name="description" class="form-control" ng-model="section.description">
 						</div>
 						<input type="submit" value="Submit" class="btn btn-md btn-success">
 					</form>
 				</div>			
 			</div>
 			<div class="alert alert-danger" ng-show="failed == true">
-              Adding module has failed: {{errorMsg}}
+              Adding section has failed: {{errorMsg}}
             </div>
 		</div>
 	</div>

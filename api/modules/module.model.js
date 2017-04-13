@@ -1,9 +1,14 @@
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema;
 
+var SectionsSchema = new Schema({
+	index: Number,
+	_id: String
+})
+
 var ModuleSchema = new Schema({
 	name: { type: String, required: true },
-	sections: [Number],
+	sections: [SectionsSchema],
 	lecturer: {type: String, required: true},
 	students: [Number],
 	hidden: Boolean
