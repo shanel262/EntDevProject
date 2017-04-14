@@ -182,18 +182,12 @@ entDev.factory('AddModuleService', ["$location", "$http", function($location, $h
 }])
 
 //Module
-entDev.controller('ModuleController', ["$scope", "ModuleService", "AddSectionService","$rootScope", "$routeParams", function($scope, ModuleService, AddSectionService,$rootScope, $routeParams){
+entDev.controller('ModuleController', ["$scope", "ModuleService", "AddService","$rootScope", "$routeParams", function($scope, ModuleService, AddService,$rootScope, $routeParams){
 	$rootScope.failed = false
 	$scope.sections = []
 	ModuleService.getModuleTopics($routeParams._id).then(function(res){
 		$scope.name = res.data.name
 		$scope.id = res.data._id
-		// for(var i = 0; i < res.data.sections.length; i++){
-		// 	ModuleService.getSection(res.data.sections[i]._id).then(function(res){
-		// 		$scope.sections.push(res.data)
-		// 		console.log('RES2:', $scope.sections)
-		// 	})
-		// }
 		var sections = []
 		for(var i=0; i < res.data.sections.length; i++){
 			sections.push(res.data.sections[i]._id)
@@ -260,7 +254,7 @@ entDev.factory('ModuleService', ["$location", "$http", function($location, $http
 }])
 
 //Add section
-entDev.factory('AddSectionService', ["$location", "$http", "$routeParams", function($location, $http, $routeParams){
+entDev.factory('AddService', ["$location", "$http", "$routeParams", function($location, $http, $routeParams){
 	addSection = function(section){
 		$http({
 			method: 'POST',

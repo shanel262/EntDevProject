@@ -26,3 +26,21 @@ exports.getSections = function(req, res){
 		}
 	})
 }
+
+exports.uploadFile = function(req, res){
+	console.log('uploadFile API:', req.file)
+	console.log('REQ:', req.body)
+	var content = {
+		name: req.file.originalname,
+		multerId: req.file.filename
+	}
+	Section.findById(req.body.sectionId, function(err, section){
+		if(err){handleError(res, err)}
+		else{
+			console.log('Found section:', section)
+			section.content.push(content)
+			section.save()
+			return res.status(200).redirect('/#/module/' + req.body.moduleId)			
+		}
+	})
+}
