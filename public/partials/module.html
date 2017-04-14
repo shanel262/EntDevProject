@@ -6,8 +6,8 @@
 					<h3>{{name}}</h3><a href="#/module/{{id}}/addSection" class="btn btn-success btn-sm">Add Section</a>
 				</div>
 				<div class="panel-body" ng-repeat="section in sections">
-					<h3>{{section.name}}</h3>
-					<label>{{section.description}}</label>
+					<h3>{{section.name}}  <button class="btn btn-default btn-sm" ng-click="unlink(section._id)">Unlink</button></h3>
+					<label>{{section.description}} {{section._id}}</label>
 					<ol>
 						<li ng-repeat="content in section.content"><a href="/api/sections/downloadFile/{{content._id}}" download="{{content.name}}">{{content.name}}</a></li>
 					</ol>

@@ -58,3 +58,25 @@ exports.downloadFile = function(req, res){
 		}
 	})
 }
+
+exports.unlink = function(req, res){
+	console.log('AT unlink API:', req.params.sectionId)
+	Section.find({_id: req.params.sectionId}, function(err, section){
+		if(err){handleError(res, err)}
+		else if(section.length >= 1){ //CHANGE TO > 1
+			console.log('Found section(s):', section)
+			var dupSection = {
+				name: section[0].name,
+				description: section[0].description,
+				content: section[0].content
+			}
+			Section.create(dupSection, function(err, newSection){
+				if(err){handleError(res, err)}
+				else{
+					console.log('New section made:', newSection)
+					res.status(200).json(newSection)
+				}
+			})
+		}
+	})
+}

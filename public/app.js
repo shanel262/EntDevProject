@@ -205,6 +205,10 @@ entDev.controller('ModuleController', ["$scope", "ModuleService", "SectionServic
 		console.log('downloadFile:', fileId)
 		downloadFile(fileId)
 	}
+	$scope.unlink = function(sectionId){
+		console.log('sectionId:', sectionId.toString())
+		unlink(sectionId.toString())
+	}
 }])
 
 entDev.factory('ModuleService', ["$location", "$http", function($location, $http){
@@ -276,7 +280,6 @@ entDev.factory('SectionService', ["$location", "$http", "$routeParams", function
 		})
 	}
 	downloadFile = function(fileId){
-		console.log('AT downloadFile service:', fileId)
 		$http({
 			method: 'GET',
 			url: '/api/sections/downloadFile/' + fileId
@@ -286,6 +289,19 @@ entDev.factory('SectionService', ["$location", "$http", "$routeParams", function
 		})
 		.error(function(res){
 			console.log('Failed to download:', res)
+		})
+	}
+	unlink = function(sectionId){
+		console.log('UNLINK SERVICE:', sectionId)
+		$http({
+			method: 'GET',
+			url: '/api/sections/unlink/' + sectionId 
+		})
+		.success(function(res){
+			console.log('Successfully unlinked:', res)
+		})
+		.error(function(res){
+			console.log('Failed to unlink:', res)
 		})
 	}
 }])
