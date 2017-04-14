@@ -188,12 +188,20 @@ entDev.controller('ModuleController', ["$scope", "ModuleService", "AddSectionSer
 	ModuleService.getModuleTopics($routeParams._id).then(function(res){
 		$scope.name = res.data.name
 		$scope.id = res.data._id
-		for(var i = 0; i < res.data.sections.length; i++){
-			ModuleService.getSection(res.data.sections[i]._id).then(function(res){
-				console.log('RES:', res)
-				$scope.sections.push(res.data)
-			})
+		// for(var i = 0; i < res.data.sections.length; i++){
+		// 	ModuleService.getSection(res.data.sections[i]._id).then(function(res){
+		// 		$scope.sections.push(res.data)
+		// 		console.log('RES2:', $scope.sections)
+		// 	})
+		// }
+		var sections = []
+		for(var i=0; i < res.data.sections.length; i++){
+			sections.push(res.data.sections[i]._id)
 		}
+		ModuleService.getSections(sections).then(function(res){
+			console.log('RES2:', res.data)
+			$scope.sections = res.data
+		})
 	})
 	$scope.addSection = function(){
 		$scope.section.moduleId = $routeParams._id
@@ -218,10 +226,26 @@ entDev.factory('ModuleService', ["$location", "$http", function($location, $http
 			})
 		},
 		getSection: function(_id){
-			console.log('GET SECTION', _id)
 			return $http({
 				method: 'GET',
 				url: '/api/sections/getSection/' + _id
+			})
+			.success(function(res){
+				console.log('Successfully retrieved section:', res)
+				return res
+			})
+			.error(function(res){
+				console.log('Failed to retrieve section:', res)
+				return res
+			})
+		},
+		getSections: function(sections){
+			return $http({
+				method: 'GET',
+				url: '/api/sections/getSections',
+				params: {
+					sections: sections
+				}
 			})
 			.success(function(res){
 				console.log('Successfully retrieved section:', res)

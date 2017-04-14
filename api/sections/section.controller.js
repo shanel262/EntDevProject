@@ -15,3 +15,14 @@ exports.getSection = function(req, res){
 		}
 	})
 }
+
+exports.getSections = function(req, res){
+	console.log('getSections API:', req.query.sections)
+	Section.find({_id: {$in: req.query.sections}}, function(err, sections){
+		if(err){handleError(res, err)}
+		else{
+			console.log('Found sections:', sections)
+			return res.status(200).json(sections)
+		}
+	})
+}
