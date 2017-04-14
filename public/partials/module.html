@@ -9,11 +9,11 @@
 					<h3>{{section.name}}</h3>
 					<label>{{section.description}}</label>
 					<ol>
-						<li>Content 1</li>
-						<li>Content 2</li>
+						<li ng-repeat="content in section.content"><a href="/api/sections/downloadFile/{{content._id}}" download="{{content.name}}">{{content.name}}</a></li>
 					</ol>
 
-					<form action="/api/sections/uploadFile" method="post" enctype="multipart/form-data"> <!-- ng-submit="uploadFile()" -->
+					<form action="/api/sections/uploadFile" method="post" enctype="multipart/form-data"
+						style="border: thin solid lightgrey; background-color: lightgrey">
 						<input type="file" name="myFile" ng-model="aFile">
 						<br>
 						<input type="text" name="moduleId" ng-model="id" hidden>

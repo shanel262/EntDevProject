@@ -3,7 +3,8 @@ var Schema = mongoose.Schema;
 
 var ContentSchema = new Schema({
 	name: { type: String, required: true },
-	multerId: { type: String, required: true }
+	multerId: { type: String, required: true },
+	mimetype: { type: String, required: true }
 })
 
 var SectionSchema = new Schema({

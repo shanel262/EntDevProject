@@ -1,5 +1,5 @@
 var Section = require('./section.model');
-
+var path = require('path')
 
 function handleError(res, err) {
   console.log(err);
@@ -29,10 +29,10 @@ exports.getSections = function(req, res){
 
 exports.uploadFile = function(req, res){
 	console.log('uploadFile API:', req.file)
-	console.log('REQ:', req.body)
 	var content = {
 		name: req.file.originalname,
-		multerId: req.file.filename
+		multerId: req.file.filename,
+		mimetype: req.file.mimetype
 	}
 	Section.findById(req.body.sectionId, function(err, section){
 		if(err){handleError(res, err)}
@@ -41,6 +41,20 @@ exports.uploadFile = function(req, res){
 			section.content.push(content)
 			section.save()
 			return res.status(200).redirect('/#/module/' + req.body.moduleId)			
+		}
+	})
+}
+
+exports.downloadFile = function(req, res){
+	console.log('At downloadFile API:', req.params.fileId)
+	console.log('DIR:', __dirname)
+	Section.findOne({'content._id': req.params.fileId}, {'content.$.': true}).exec(function(err, data){
+		if(err){handleError(res, err)}
+		else{
+			console.log('Found content:', data)
+  			res.setHeader('Content-type', data.content[0].mimetype);
+			var filepath = path.resolve(__dirname + '/../../files/' + data.content[0].multerId)
+			res.download(filepath, data.content[0].name.toString())
 		}
 	})
 }

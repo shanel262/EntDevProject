@@ -8,6 +8,6 @@ var router = express.Router();
 router.get('/getSection/:sectionId', controller.getSection); //Get a section for a module
 router.get('/getSections', controller.getSections); //Get sections for a module
 router.post('/uploadFile', upload.single('myFile'), controller.uploadFile); //Upload a file
-// router.post('/register', controller.register); //Register a user
+router.get('/downloadFile/:fileId', controller.downloadFile); //Download a file
 
 module.exports = router;

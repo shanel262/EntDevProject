@@ -182,7 +182,7 @@ entDev.factory('AddModuleService', ["$location", "$http", function($location, $h
 }])
 
 //Module
-entDev.controller('ModuleController', ["$scope", "ModuleService", "AddService","$rootScope", "$routeParams", function($scope, ModuleService, AddService,$rootScope, $routeParams){
+entDev.controller('ModuleController', ["$scope", "ModuleService", "SectionService","$rootScope", "$routeParams", function($scope, ModuleService, SectionService,$rootScope, $routeParams){
 	$rootScope.failed = false
 	$scope.sections = []
 	ModuleService.getModuleTopics($routeParams._id).then(function(res){
@@ -200,6 +200,10 @@ entDev.controller('ModuleController', ["$scope", "ModuleService", "AddService","
 	$scope.addSection = function(){
 		$scope.section.moduleId = $routeParams._id
 		addSection($scope.section)
+	}
+	$scope.downloadFile = function(fileId){
+		console.log('downloadFile:', fileId)
+		downloadFile(fileId)
 	}
 }])
 
@@ -254,7 +258,7 @@ entDev.factory('ModuleService', ["$location", "$http", function($location, $http
 }])
 
 //Add section
-entDev.factory('AddService', ["$location", "$http", "$routeParams", function($location, $http, $routeParams){
+entDev.factory('SectionService', ["$location", "$http", "$routeParams", function($location, $http, $routeParams){
 	addSection = function(section){
 		$http({
 			method: 'POST',
@@ -269,6 +273,19 @@ entDev.factory('AddService', ["$location", "$http", "$routeParams", function($lo
 			console.log('Failed to add:', res)
 			$rootScope.failed = true
 			$rootScope.errorMsg = res
+		})
+	}
+	downloadFile = function(fileId){
+		console.log('AT downloadFile service:', fileId)
+		$http({
+			method: 'GET',
+			url: '/api/sections/downloadFile/' + fileId
+		})
+		.success(function(res){
+			console.log('Successfully downloaded:', res)
+		})
+		.error(function(res){
+			console.log('Failed to download:', res)
 		})
 	}
 }])
