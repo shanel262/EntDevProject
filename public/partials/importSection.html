@@ -1,0 +1,28 @@
+<div class="container-fluid" ng-controller="ImportController">
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2">
+			<div class="panel panel-primary">
+				<div class="panel-heading" style="text-align: center;">
+					<b>Import Section</b>
+				</div>	
+				<div class="panel-body">
+					<table class="table table-bordered">
+						<thead>
+							<td>Module Name</td>
+							<td>Section Name</td>
+						</thead>
+						<tbody>
+							<tr ng-repeat="module in modules">
+								<td>{{module.name}}</td>
+								<td>{{module.sections}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>		
+			</div>
+			<div class="alert alert-danger" ng-show="failed == true">
+              Importing section has failed: {{errorMsg}}
+            </div>
+		</div>
+	</div>
+</div>

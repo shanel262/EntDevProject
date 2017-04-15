@@ -21,6 +21,9 @@ entDev.config(['$routeProvider',
 		.when('/module/:_id/addSection', {
 			templateUrl: 'partials/addSection.html'
 		})
+		.when('/module/:_id/importSection', {
+			templateUrl: 'partials/importSection.html'
+		})
 		.otherwise({
 			redirectTo: "/home"
 		})
@@ -303,5 +306,23 @@ entDev.factory('SectionService', ["$location", "$http", "$routeParams", function
 		.error(function(res){
 			console.log('Failed to unlink:', res)
 		})
+	}
+}])
+
+entDev.controller('ImportController', ["$scope", "$location", "$http", "$rootScope", "HomeService", function($scope, $location, $http, $rootScope, HomeService){
+	$rootScope.loggedInUser = {
+		id: '58ef6387f853ef755eeefa15',
+		name: 'Shane Lacey',
+		username: 'shanel262',
+		role: 'Lecturer'
+	}
+	$scope.modules = []
+	HomeService.getModules($rootScope.loggedInUser.id).then(function(res){
+		$scope.modules = res.data
+	})
+}])
+
+entDev.factory('ImportService', ["$location", "$http", function($location, $http){
+	return {
 	}
 }])

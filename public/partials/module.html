@@ -1,9 +1,11 @@
 <div class="container-fluid" ng-controller="ModuleController">
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2">
-			<div class="panel panel-primary">
+			<div class="panel panel-default">
 				<div class="panel-heading" style="text-align: center;">
-					<h3>{{name}}</h3><a href="#/module/{{id}}/addSection" class="btn btn-success btn-sm">Add Section</a>
+					<h3>{{name}}</h3>
+					<a href="#/module/{{id}}/addSection" class="btn btn-success btn-sm">Add Section</a>
+					<a href="#/module/{{id}}/importSection" class="btn btn-success btn-sm">Import Section</a>
 				</div>
 				<div class="panel-body" ng-repeat="section in sections">
 					<h3>{{section.name}}  <button class="btn btn-default btn-sm" ng-click="unlink(section._id)">Unlink</button></h3>
