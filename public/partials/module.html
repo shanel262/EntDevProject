@@ -6,6 +6,8 @@
 					<h3>{{name}}</h3>
 					<a href="#/module/{{id}}/addSection" class="btn btn-success btn-sm">Add Section</a>
 					<a href="#/module/{{id}}/importSection" class="btn btn-success btn-sm">Import Section</a>
+					<a ng-click="edit()" ng-if="editSection == false" class="btn btn-default btn-sm">Edit</a>
+					<a ng-click="save()" ng-if="editSection == true" class="btn btn-default btn-sm">Save</a>
 				</div>
 				<div class="panel-body" ng-repeat="section in sections">
 					<h3>{{section.name}}  
@@ -15,7 +17,10 @@
 					</h3>
 					<label>{{section.description}} {{section._id}}</label>
 					<ol>
-						<li ng-repeat="content in section.content"><a href="/api/sections/downloadFile/{{content._id}}" download="{{content.name}}">{{content.name}}</a></li>
+						<li ng-repeat="content in section.content">
+							<a href="/api/sections/downloadFile/{{content._id}}" download="{{content.name}}">{{content.name}}</a>
+							<a class="btn btn-xs btn-danger" ng-click="deleteFile(section._id, content._id)" ng-if="editSection == true">Delete</a>
+						</li>
 					</ol>
 
 					<form action="/api/sections/uploadFile" method="post" enctype="multipart/form-data"

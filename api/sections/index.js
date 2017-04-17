@@ -12,5 +12,6 @@ router.get('/downloadFile/:fileId', controller.downloadFile); //Download a file
 router.post('/unlink', controller.unlink) //unlink a section
 router.post('/show', controller.showSection) //Show a section
 router.post('/hide', controller.hideSection) //Hide a section
+router.post('/deleteFile', controller.deleteFile) //Delete a file
 
 module.exports = router;

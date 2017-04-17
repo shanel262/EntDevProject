@@ -193,6 +193,7 @@ entDev.factory('AddModuleService', ["$location", "$http", function($location, $h
 //Module
 entDev.controller('ModuleController', ["$scope", "ModuleService", "SectionService","$rootScope", "$routeParams", "$window", function($scope, ModuleService, SectionService,$rootScope, $routeParams, $window){
 	$rootScope.failed = false
+	$scope.editSection = false
 	$scope.sections = []
 	ModuleService.getModuleTopics($routeParams._id).then(function(res){
 		$scope.name = res.data.name
@@ -233,6 +234,22 @@ entDev.controller('ModuleController', ["$scope", "ModuleService", "SectionServic
 	$scope.hide = function(sectionId){
 		var section = { sectionId: sectionId}
 		hide(section)
+	}
+	$scope.edit = function(){
+		if($scope.editSection == false){$scope.editSection = true}
+		console.log('EDIT::', $scope.editSection)
+	}
+	$scope.save = function(){
+		if($scope.editSection == true){$scope.editSection = false}
+		console.log('SAVE::', $scope.editSection)
+	}
+	$scope.deleteFile = function(secId, fileId){
+		console.log('DELETE:', secId, fileId)
+		var secAndFile = {
+			secId: secId,
+			fileId: fileId
+		}
+		deleteFile(secAndFile)
 	}
 }])
 
@@ -314,6 +331,21 @@ entDev.factory('SectionService', ["$location", "$http", "$routeParams", "$window
 		})
 		.error(function(res){
 			console.log('Failed to download:', res)
+		})
+	}
+	deleteFile = function(secAndFile){
+		console.log('DELETE SERVICE:', secAndFile)
+		$http({
+			method: 'POST',
+			url: '/api/sections/deleteFile',
+			data: secAndFile
+		})
+		.success(function(res){
+			console.log('Successfully deleted:', res)
+			window.location.reload()
+		})
+		.error(function(res){
+			console.log('Failed to delete:', res)
 		})
 	}
 	unlink = function(modAndSec){

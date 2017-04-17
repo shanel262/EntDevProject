@@ -60,6 +60,19 @@ exports.downloadFile = function(req, res){
 	})
 }
 
+exports.deleteFile = function(req, res){
+	console.log('AT deleteFile API:', req.body.secId)
+	console.log('AT deleteFile API:', req.body)
+	Section.update({ _id: req.body.secId }, { $pull: { content: { _id: req.body.fileId } } }, { safe: true },
+		function(err, file) {
+			if (err) {handleError(res, err)}
+			else{
+				console.log('File deleted:', file)
+				return res.status(200).json(file)
+			}
+	})
+}
+
 exports.unlink = function(req, res){
 	console.log('AT unlink API:', req.body)
 	Module.find({'sections._id': req.body.secId}, function(err, modules){
@@ -95,23 +108,6 @@ exports.unlink = function(req, res){
 					})
 				}
 			})
-			// stop = function(){
-			// 	modules.save()
-			// 	return res.status(200)
-			// }
-			// modules.forEach(function(module){
-			// 	if(module._id == req.body.modId){
-			// 		module.sections.forEach(function(section){
-			// 			if(section._id == req.body.secId){
-			// 				console.log('Found the section to change:', section)
-			// 				section._id = '000000000000'
-			// 				console.log('Found the section to change:', section)
-			// 				// stop()
-			// 			}
-			// 		})
-			// 	}
-			// })
-			// modules.save()
 		}
 		else{
 			console.log('Only exists once:', modules)
