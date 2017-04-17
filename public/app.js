@@ -191,7 +191,7 @@ entDev.factory('AddModuleService', ["$location", "$http", function($location, $h
 }])
 
 //Module
-entDev.controller('ModuleController', ["$scope", "ModuleService", "SectionService","$rootScope", "$routeParams", function($scope, ModuleService, SectionService,$rootScope, $routeParams){
+entDev.controller('ModuleController', ["$scope", "ModuleService", "SectionService","$rootScope", "$routeParams", "$window", function($scope, ModuleService, SectionService,$rootScope, $routeParams, $window){
 	$rootScope.failed = false
 	$scope.sections = []
 	ModuleService.getModuleTopics($routeParams._id).then(function(res){
@@ -217,7 +217,14 @@ entDev.controller('ModuleController', ["$scope", "ModuleService", "SectionServic
 		downloadFile(fileId)
 	}
 	$scope.unlink = function(sectionId){
-		unlink(sectionId.toString())
+		var confirmation = $window.confirm('Are you sure?')
+		if(confirmation){
+			var modAndSec = {
+				modId: $routeParams._id,
+				secId: sectionId
+			}
+			unlink(modAndSec)			
+		}
 	}
 	$scope.show = function(sectionId){
 		var section = { sectionId: sectionId}
@@ -280,7 +287,7 @@ entDev.factory('ModuleService', ["$location", "$http", function($location, $http
 }])
 
 //Add section
-entDev.factory('SectionService', ["$location", "$http", "$routeParams", "$window", function($location, $http, $routeParams, $window){
+entDev.factory('SectionService', ["$location", "$http", "$routeParams", "$window", "$rootScope", function($location, $http, $routeParams, $window, $rootScope){
 	addSection = function(section){
 		$http({
 			method: 'POST',
@@ -309,14 +316,16 @@ entDev.factory('SectionService', ["$location", "$http", "$routeParams", "$window
 			console.log('Failed to download:', res)
 		})
 	}
-	unlink = function(sectionId){
-		console.log('UNLINK SERVICE:', sectionId)
+	unlink = function(modAndSec){
+		console.log('UNLINK SERVICE:', modAndSec)
 		$http({
-			method: 'GET',
-			url: '/api/sections/unlink/' + sectionId 
+			method: 'POST',
+			url: '/api/sections/unlink',
+			data: modAndSec 
 		})
 		.success(function(res){
 			console.log('Successfully unlinked:', res)
+			window.location.reload()
 		})
 		.error(function(res){
 			console.log('Failed to unlink:', res)
@@ -355,16 +364,28 @@ entDev.controller('ImportController', ["$scope", "$location", "$routeParams", "$
 		username: 'shanel262',
 		role: 'Lecturer'
 	}
-	$scope.modules = []
+	var dontInclude = []
 	var sections = []
 	$scope.import= {}
-	HomeService.getModules($rootScope.loggedInUser.id).then(function(res){
+	$scope.modId = $routeParams._id
+	HomeService.getModules($rootScope.loggedInUser.id)
+	.then(function(res){
 		$scope.modules = res.data
+		for(var module = 0; module < res.data.length; module++){
+			if(res.data[module]._id == $routeParams._id){
+				res.data[module].sections.forEach(function(section){
+					dontInclude.push(section._id)
+				})
+			}
+		}
+		console.log('dontInclude', dontInclude)
 		console.log('GOT MODULES:', res.data)
 		for(var module = 0; module < res.data.length; module++){
 			if(res.data[module]._id != $routeParams._id){
 				for(var section = 0; section < res.data[module].sections.length; section++){
-					sections.push(res.data[module].sections[section]._id)
+					if(!dontInclude.includes(res.data[module].sections[section]._id)){
+						sections.push(res.data[module].sections[section]._id)
+					}
 				}
 			}
 		}
@@ -391,7 +412,7 @@ entDev.controller('ImportController', ["$scope", "$location", "$routeParams", "$
 	}
 }])
 
-entDev.factory('ImportService', ["$location", "$http", function($location, $http){
+entDev.factory('ImportService', ["$location", "$http", "$routeParams", function($location, $http, $routeParams){
 	importSections = function(sectionIds){
 		console.log('importSections SERVICE:', sectionIds)
 		$http({
@@ -403,6 +424,8 @@ entDev.factory('ImportService', ["$location", "$http", function($location, $http
 		})
 		.success(function(res){
 			console.log('Successfully imported:', res)
+			console.log('GOING TO: #/module/' + $routeParams._id)
+			$location.path('/module/' + $routeParams._id)
 		})
 		.error(function(res){
 			console.log('Failed to import:', res)

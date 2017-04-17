@@ -1,29 +1,32 @@
 <div class="container-fluid" ng-controller="ModuleController">
-	<div class="row">
-		<div class="col-md-8 col-md-offset-2">
-			<div class="panel panel-primary">
-				<div class="panel-heading" style="text-align: center;">
-					<b>Add Section</b>
-				</div>
-				<div class="panel-body">
-					<form ng-submit="addSection()">
-						<div class="form-group">
-							<label>Name:</label>
-							<input type="text" name="name" class="form-control" ng-model="section.name" required>
-							<br>
-							<label>Description:</label>
-							<input type="text" name="description" class="form-control" ng-model="section.description">
-							<br>
-							<label>Hidden:</label>
-							<input type="checkbox" name="hidden" ng-model="section.hidden">
-						</div>
-						<input type="submit" value="Submit" class="btn btn-md btn-success">
-					</form>
-				</div>			
-			</div>
-			<div class="alert alert-danger" ng-show="failed == true">
-              Adding section has failed: {{errorMsg}}
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="btn-group pull-left" style="padding-top: 6px; padding-left: 5px">
+                <a href="#/module/{{id}}" class="btn btn-sm btn-default">Back</a>
             </div>
-		</div>
-	</div>
+            <div class="panel panel-primary">
+                <div class="panel-heading" style="text-align: center;">
+                    <b>Add Section</b>
+                </div>
+                <div class="panel-body">
+                    <form ng-submit="addSection()">
+                        <div class="form-group">
+                            <label>Name:</label>
+                            <input type="text" name="name" class="form-control" ng-model="section.name" required>
+                            <br>
+                            <label>Description:</label>
+                            <input type="text" name="description" class="form-control" ng-model="section.description">
+                            <br>
+                            <label>Hidden:</label>
+                            <input type="checkbox" name="hidden" ng-model="section.hidden">
+                        </div>
+                        <input type="submit" value="Submit" class="btn btn-md btn-success">
+                    </form>
+                </div>
+            </div>
+            <div class="alert alert-danger" ng-show="failed == true">
+                Adding section has failed: {{errorMsg}}
+            </div>
+        </div>
+    </div>
 </div>

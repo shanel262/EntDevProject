@@ -1,4 +1,5 @@
 var Section = require('./section.model');
+var Module = require('../modules/module.model')
 var path = require('path')
 
 function handleError(res, err) {
@@ -60,23 +61,61 @@ exports.downloadFile = function(req, res){
 }
 
 exports.unlink = function(req, res){
-	console.log('AT unlink API:', req.params.sectionId)
-	Section.find({_id: req.params.sectionId}, function(err, section){
+	console.log('AT unlink API:', req.body)
+	Module.find({'sections._id': req.body.secId}, function(err, modules){
 		if(err){handleError(res, err)}
-		else if(section.length >= 1){ //CHANGE TO > 1
-			console.log('Found section(s):', section)
-			var dupSection = {
-				name: section[0].name,
-				description: section[0].description,
-				content: section[0].content
-			}
-			Section.create(dupSection, function(err, newSection){
+		else if(modules.length > 1){
+			console.log('Found modules:', modules)
+			Section.find({_id: req.body.secId}, function(err, section){
 				if(err){handleError(res, err)}
 				else{
-					console.log('New section made:', newSection)
-					res.status(200).json(newSection)
+					var dupSection = {
+						name: section[0].name,
+						description: section[0].description,
+						content: section[0].content,
+						hidden: section[0].hidden
+					}
+					Section.create(dupSection, function(err, newSection){
+						if(err){handleError(res, err)}
+						else{
+							console.log('New section made:', newSection)
+							Module.findById(req.body.modId, function(err, module){
+								if(err){handleError(res, err)}
+								else{
+									module.sections.forEach(function(section){
+										if(section._id == req.body.secId){
+											section._id = newSection._id
+										}
+									})
+									module.save()
+									res.status(200).json(module)
+								}
+							})
+						}
+					})
 				}
 			})
+			// stop = function(){
+			// 	modules.save()
+			// 	return res.status(200)
+			// }
+			// modules.forEach(function(module){
+			// 	if(module._id == req.body.modId){
+			// 		module.sections.forEach(function(section){
+			// 			if(section._id == req.body.secId){
+			// 				console.log('Found the section to change:', section)
+			// 				section._id = '000000000000'
+			// 				console.log('Found the section to change:', section)
+			// 				// stop()
+			// 			}
+			// 		})
+			// 	}
+			// })
+			// modules.save()
+		}
+		else{
+			console.log('Only exists once:', modules)
+			res.status(304).send('It is not linked to any other module')
 		}
 	})
 }
