@@ -84,7 +84,7 @@ entDev.factory('HomeService', ["$location", "$http", function($location, $http){
 }])
 
 //Users
-entDev.controller('UsersController', ["$scope", "UsersService", "$rootScope", "$route", function($scope, UsersService, $rootScope, $route){
+entDev.controller('UsersController', ["$scope", "UsersService", "$rootScope", "$route", "$window", function($scope, UsersService, $rootScope, $route, $window){
 	$scope.roles = ["Student", "Lecturer"]
 	$rootScope.failed = false
 	$rootScope.errorMsg = ''
@@ -98,12 +98,15 @@ entDev.controller('UsersController', ["$scope", "UsersService", "$rootScope", "$
 	$rootScope.logout = function(){
 		console.log('LOGOUT')
 		$rootScope.loggedInUser = null
+		$window.localStorage.setItem('id', null)
+		$window.localStorage.setItem('username', null)
+		$window.localStorage.setItem('role', null)
 		$scope.$apply()
 		$route.reload()
 	}
 }])
 
-entDev.factory('UsersService', ["$location", "$http", "$rootScope",function($location, $http, $rootScope){
+entDev.factory('UsersService', ["$location", "$http", "$rootScope", "$window", function($location, $http, $rootScope, $window){
 	$rootScope.loggedInUser = null
 	login = function(user){
 		$http({
@@ -116,10 +119,13 @@ entDev.factory('UsersService', ["$location", "$http", "$rootScope",function($loc
 				id: res._id,
 				username: res.username,
 				name: res.name,
-				role: res.name
+				role: res.role
 			}
 			// $rootScope.loggedInUser = res.username
 			console.log('loggedInUser:', $rootScope.loggedInUser)
+			$window.localStorage.setItem('id', res._id)
+			$window.localStorage.setItem('username', res.username)
+			$window.localStorage.setItem('role', res.role)
 			$rootScope.failed = false
 			$location.path('/home')
 		})
@@ -202,15 +208,24 @@ entDev.controller('ModuleController', ["$scope", "ModuleService", "SectionServic
 	})
 	$scope.addSection = function(){
 		$scope.section.moduleId = $routeParams._id
+		if($scope.section.hidden == undefined){
+			$scope.section.hidden = false
+		}
 		addSection($scope.section)
 	}
 	$scope.downloadFile = function(fileId){
-		console.log('downloadFile:', fileId)
 		downloadFile(fileId)
 	}
 	$scope.unlink = function(sectionId){
-		console.log('sectionId:', sectionId.toString())
 		unlink(sectionId.toString())
+	}
+	$scope.show = function(sectionId){
+		var section = { sectionId: sectionId}
+		show(section)
+	}
+	$scope.hide = function(sectionId){
+		var section = { sectionId: sectionId}
+		hide(section)
 	}
 }])
 
@@ -265,7 +280,7 @@ entDev.factory('ModuleService', ["$location", "$http", function($location, $http
 }])
 
 //Add section
-entDev.factory('SectionService', ["$location", "$http", "$routeParams", function($location, $http, $routeParams){
+entDev.factory('SectionService', ["$location", "$http", "$routeParams", "$window", function($location, $http, $routeParams, $window){
 	addSection = function(section){
 		$http({
 			method: 'POST',
@@ -307,9 +322,33 @@ entDev.factory('SectionService', ["$location", "$http", "$routeParams", function
 			console.log('Failed to unlink:', res)
 		})
 	}
+	show = function(sectionId){
+		$http({
+			method: 'POST',
+			url: '/api/sections/show',
+			data: sectionId
+		})
+		.success(function(res){
+			console.log('Successfully changed to show', res)
+			window.location.reload()
+		})
+		.error(function(res){console.log('Failed to change to show', res)})
+	}
+	hide = function(sectionId){
+		$http({
+			method: 'POST',
+			url: '/api/sections/hide',
+			data: sectionId
+		})
+		.success(function(res){
+			console.log('Successfully changed to hide', res)
+			window.location.reload()
+		})
+		.error(function(res){console.log('Failed to change to hide', res)})
+	}
 }])
 
-entDev.controller('ImportController', ["$scope", "$location", "$http", "$rootScope", "HomeService", function($scope, $location, $http, $rootScope, HomeService){
+entDev.controller('ImportController', ["$scope", "$location", "$routeParams", "$rootScope", "HomeService", "ModuleService", "ImportService", function($scope, $location, $routeParams, $rootScope, HomeService, ModuleService, ImportService){
 	$rootScope.loggedInUser = {
 		id: '58ef6387f853ef755eeefa15',
 		name: 'Shane Lacey',
@@ -317,12 +356,56 @@ entDev.controller('ImportController', ["$scope", "$location", "$http", "$rootSco
 		role: 'Lecturer'
 	}
 	$scope.modules = []
+	var sections = []
+	$scope.import= {}
 	HomeService.getModules($rootScope.loggedInUser.id).then(function(res){
 		$scope.modules = res.data
+		console.log('GOT MODULES:', res.data)
+		for(var module = 0; module < res.data.length; module++){
+			if(res.data[module]._id != $routeParams._id){
+				for(var section = 0; section < res.data[module].sections.length; section++){
+					sections.push(res.data[module].sections[section]._id)
+				}
+			}
+		}
 	})
+	.then(function(){
+		getSections()
+	})
+	var getSections = function(){
+		ModuleService.getSections(sections).then(function(res){
+			console.log("GOT SECTIONS:", res.data)
+			$scope.sections = res.data
+		})
+	}
+	$scope.importSections = function(){
+		var sectionIds = []
+		Object.keys($scope.import).forEach(function(key){
+			if($scope.import[key] == true){
+				sectionIds.push(key)
+			}
+		})
+		sectionIds.push($routeParams._id)
+		console.log('sectionIds:', sectionIds)
+		importSections(sectionIds)
+	}
 }])
 
 entDev.factory('ImportService', ["$location", "$http", function($location, $http){
-	return {
+	importSections = function(sectionIds){
+		console.log('importSections SERVICE:', sectionIds)
+		$http({
+			method: 'POST',
+			url: '/api/modules/importSections',
+			params: {
+				sectionIds: sectionIds
+			}
+		})
+		.success(function(res){
+			console.log('Successfully imported:', res)
+		})
+		.error(function(res){
+			console.log('Failed to import:', res)
+		})
 	}
 }])

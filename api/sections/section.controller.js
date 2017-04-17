@@ -80,3 +80,29 @@ exports.unlink = function(req, res){
 		}
 	})
 }
+
+exports.showSection = function(req, res){
+	console.log('AT showSection API:', req.body)
+	Section.findById({_id: req.body.sectionId}, function(err, section){
+		if(err){handleError(res, err)}
+		else{
+			console.log('Found section:', section)
+			section.hidden = false
+			section.save()
+			return res.status(200).json(section)
+		}
+	})
+}
+
+exports.hideSection = function(req, res){
+	console.log('AT hideSection API:', req.body)
+	Section.findById({_id: req.body.sectionId}, function(err, section){
+		if(err){handleError(res, err)}
+		else{
+			console.log('Found section:', section)
+			section.hidden = true
+			section.save()
+			return res.status(200).json(section)
+		}
+	})
+}

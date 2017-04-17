@@ -1,7 +1,8 @@
 var express = require('express');
 
 var app = express();
-var mongoose = require('mongoose');    // NEW   
+var mongoose = require('mongoose');    // NEW
+mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/moodle'); // NEW
 
 require('./config/express').addMiddleware(app)

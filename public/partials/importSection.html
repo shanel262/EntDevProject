@@ -6,18 +6,22 @@
 					<b>Import Section</b>
 				</div>	
 				<div class="panel-body">
+					<p>{{import}}</p>
 					<table class="table table-bordered">
 						<thead>
-							<td>Module Name</td>
-							<td>Section Name</td>
+							<td>Section Id</td>
+							<td>Section Name and Desc</td>
+							<td>Import</td>
 						</thead>
 						<tbody>
-							<tr ng-repeat="module in modules">
-								<td>{{module.name}}</td>
-								<td>{{module.sections}}</td>
+							<tr ng-repeat="section in sections">
+								<td>{{section._id}}</td>
+								<td>{{section.name}} <b>Desc:</b> {{section.description}}</td>
+								<td><input type="checkbox" name="import" ng-model="import[section._id]" value="{{section._id}}"></td>
 							</tr>
 						</tbody>
 					</table>
+					<button class="btn btn-success btn-block" ng-click="importSections()">Import</button>
 				</div>		
 			</div>
 			<div class="alert alert-danger" ng-show="failed == true">

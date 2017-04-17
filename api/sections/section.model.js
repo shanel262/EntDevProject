@@ -10,7 +10,8 @@ var ContentSchema = new Schema({
 var SectionSchema = new Schema({
 	name: { type: String, required: true },
 	description: String,
-	content: [ContentSchema]
+	content: [ContentSchema],
+	hidden: Boolean
 });
 
 module.exports = mongoose.model('sections', SectionSchema);

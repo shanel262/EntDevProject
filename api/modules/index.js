@@ -7,6 +7,6 @@ router.get('/getModules/:userId', controller.getModules); //Get modules for a us
 router.post('/addModule', controller.addModule) //Add a module
 router.get('/getModule/:moduleId', controller.getModule) //Get single module
 router.post('/addSection', controller.addSection)
-// router.post('/register', controller.register); //Register a user
+router.post('/importSections', controller.importSections); //Import sections
 
 module.exports = router;

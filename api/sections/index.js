@@ -10,5 +10,7 @@ router.get('/getSections', controller.getSections); //Get sections for a module
 router.post('/uploadFile', upload.single('myFile'), controller.uploadFile); //Upload a file
 router.get('/downloadFile/:fileId', controller.downloadFile); //Download a file
 router.get('/unlink/:sectionId', controller.unlink) //unlink a section
+router.post('/show', controller.showSection) //Show a section
+router.post('/hide', controller.hideSection) //Hide a section
 
 module.exports = router;
