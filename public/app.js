@@ -24,6 +24,9 @@ entDev.config(['$routeProvider',
 		.when('/module/:_id/importSection', {
 			templateUrl: 'partials/importSection.html'
 		})
+		.when('/module/:_id/editStudents', {
+			templateUrl: 'partials/editStudents.html'
+		})
 		.otherwise({
 			redirectTo: "/home"
 		})
@@ -47,12 +50,12 @@ entDev.config(['$routeProvider',
 
 //Home
 entDev.controller('HomeController', ["$scope", "HomeService", "$rootScope", function($scope, HomeService, $rootScope){
-	// $rootScope.loggedInUser = {
-	// 	id: '58ef6387f853ef755eeefa15',
-	// 	name: 'Shane Lacey',
-	// 	username: 'shanel262',
-	// 	role: 'Lecturer'
-	// }
+	$rootScope.loggedInUser = {
+		id: '58ef6387f853ef755eeefa15',
+		name: 'Shane Lacey',
+		username: 'shanel262',
+		role: 'Lecturer'
+	}
 	$scope.modules = []
 	function getModules(){
 		if($rootScope.loggedInUser){
@@ -500,4 +503,30 @@ entDev.factory('ImportService', ["$location", "$http", "$routeParams", function(
 			console.log('Failed to import:', res)
 		})
 	}
+}])
+
+entDev.controller('EditStudentsController', ["$http", "$routeParams", function($http, $routeParams){
+	$rootScope.loggedInUser = {
+		id: '58ef6387f853ef755eeefa15',
+		name: 'Shane Lacey',
+		username: 'shanel262',
+		role: 'Lecturer'
+	}
+	
+	$scope.modId = $routeParams._id
+
+	$http({
+		method: 'GET',
+		url: '/api/users/getAllStudents',
+	})
+	.success(function(res){
+		$scope.students = res.data
+	})
+	.error(function(res){
+		console.log('Failed to find all students', res)
+	})
+}])
+
+entDev.factory('EditStudentsServices', [function(){
+
 }])
