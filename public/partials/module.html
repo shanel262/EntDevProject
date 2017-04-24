@@ -1,5 +1,5 @@
 <div class="container-fluid" ng-controller="ModuleController">
-	<div class="row">
+	<div class="row" ng-if="viewAsStudent == false">
 		<div class="col-md-8 col-md-offset-2">
 			<div class="panel panel-default">
 				<div class="panel-heading" style="text-align: center;">
@@ -8,12 +8,20 @@
 					<a href="#/module/{{id}}/importSection" class="btn btn-success btn-sm">Import Section</a>
 					<a ng-click="edit()" ng-if="editSection == false" class="btn btn-default btn-sm">Edit</a>
 					<a ng-click="save()" ng-if="editSection == true" class="btn btn-default btn-sm">Save</a>
+					<a ng-click="changeView()" class="btn btn-default btn-sm">View as Student</a>
 				</div>
-				<div class="panel-body" ng-repeat="section in sections">
-					<h3>{{section.name}}  
+				<div class="panel-body" ng-repeat="section in sections | orderBy:index">
+					<h3>{{section.name}}  {{section.index}}
 						<button class="btn btn-default btn-sm" ng-click="unlink(section._id)">Unlink</button>
 						<button class="btn btn-default btn-sm" ng-click="show(section._id)" ng-if="section.hidden == true">Show</button>
 						<button class="btn btn-default btn-sm" ng-click="hide(section._id)" ng-if="section.hidden == false">Hide</button>
+						<button class="btn btn-default btn-sm" ng-click="moveDown(section._id)">Move down</button>
+						<div class="dropdown">
+							<button class="btn btn-default dropdown-toggle btn-sm" type="button" data-toggle="dropdown">Move<span class="caret"></span></button>
+							<ul class="dropdown-menu">
+								<li ng-repeat="index in sectionsInModule"><a>{{index.index}}</a></li>
+							</ul>
+						</div>
 					</h3>
 					<label>{{section.description}} {{section._id}}</label>
 					<ol>
@@ -32,6 +40,31 @@
 						<button class="btn btn-sm btn-success" type="submit">Submit</button>
 					</form>
 
+				</div>
+				<div class="panel-body" ng-show="sections.length == 0">
+					No sections
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row" ng-if="viewAsStudent == true">
+		<div class="col-md-8 col-md-offset-2">
+			<div class="panel panel-default">
+				<div class="panel-heading" style="text-align: center;">
+					<h3>{{name}}</h3>
+					<a ng-click="changeView()" ng-if="loggedInUser.role == 'Lecturer'" class="btn btn-default btn-sm">View as Lecturer</a>
+				</div>
+				<div class="panel-body" ng-repeat="section in sections | orderBy:index">
+					<h3>{{section.name}}  {{section.index}}
+					</h3>
+					<label>{{section.description}} {{section._id}}</label>
+					<ol>
+						<li ng-repeat="content in section.content">
+							<a href="/api/sections/downloadFile/{{content._id}}" download="{{content.name}}">{{content.name}}</a>
+							<a class="btn btn-xs btn-danger" ng-click="deleteFile(section._id, content._id)" ng-if="editSection == true">Delete</a>
+						</li>
+					</ol>
 				</div>
 				<div class="panel-body" ng-show="sections.length == 0">
 					No sections

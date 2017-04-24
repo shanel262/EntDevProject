@@ -47,12 +47,12 @@ entDev.config(['$routeProvider',
 
 //Home
 entDev.controller('HomeController', ["$scope", "HomeService", "$rootScope", function($scope, HomeService, $rootScope){
-	$rootScope.loggedInUser = {
-		id: '58ef6387f853ef755eeefa15',
-		name: 'Shane Lacey',
-		username: 'shanel262',
-		role: 'Lecturer'
-	}
+	// $rootScope.loggedInUser = {
+	// 	id: '58ef6387f853ef755eeefa15',
+	// 	name: 'Shane Lacey',
+	// 	username: 'shanel262',
+	// 	role: 'Lecturer'
+	// }
 	$scope.modules = []
 	function getModules(){
 		if($rootScope.loggedInUser){
@@ -72,7 +72,7 @@ entDev.factory('HomeService', ["$location", "$http", function($location, $http){
 				url: '/api/modules/getModules/' + userId
 			})
 			.success(function(res){
-				console.log('Successful retrieval;', res)
+				// console.log('Successful retrieval;', res)
 				return res
 			})
 			.error(function(res){
@@ -192,8 +192,15 @@ entDev.factory('AddModuleService', ["$location", "$http", function($location, $h
 
 //Module
 entDev.controller('ModuleController', ["$scope", "ModuleService", "SectionService","$rootScope", "$routeParams", "$window", function($scope, ModuleService, SectionService,$rootScope, $routeParams, $window){
+	$rootScope.loggedInUser = {
+		id: '58ef6387f853ef755eeefa15',
+		name: 'Shane Lacey',
+		username: 'shanel262',
+		role: 'Lecturer'
+	}
 	$rootScope.failed = false
 	$scope.editSection = false
+	$scope.viewAsStudent = false
 	$scope.sections = []
 	ModuleService.getModuleTopics($routeParams._id).then(function(res){
 		$scope.name = res.data.name
@@ -202,8 +209,18 @@ entDev.controller('ModuleController', ["$scope", "ModuleService", "SectionServic
 		for(var i=0; i < res.data.sections.length; i++){
 			sections.push(res.data.sections[i]._id)
 		}
+		$scope.sectionsInModule = res.data.sections
+		var sectionsInModule = res.data.sections
 		ModuleService.getSections(sections).then(function(res){
-			console.log('RES2:', res.data)
+			// console.log('RES2:', res.data)
+			res.data.forEach(function(section){
+				sectionsInModule.forEach(function(secInMod){
+					if(secInMod._id == section._id){
+						section.index = secInMod.index
+					}
+				})
+			})
+			$scope.index = 'index'
 			$scope.sections = res.data
 		})
 	})
@@ -251,6 +268,26 @@ entDev.controller('ModuleController', ["$scope", "ModuleService", "SectionServic
 		}
 		deleteFile(secAndFile)
 	}
+	$scope.changeView = function(){
+		console.log('viewAsStudent:', $scope.viewAsStudent)
+		if($scope.viewAsStudent){
+			$scope.viewAsStudent = false
+		}
+		else{
+			$scope.viewAsStudent = true
+		}
+	}
+
+	$scope.moveDown = function(sectionId){
+		console.log('SECTIONID:', sectionId)
+		$scope.sections.forEach(function(section){
+			if(section._id == sectionId){
+				console.log('Before:', section.index)
+				section.index++
+				console.log('After:', section.index)
+			}
+		})
+	}
 }])
 
 entDev.factory('ModuleService', ["$location", "$http", function($location, $http){
@@ -261,7 +298,7 @@ entDev.factory('ModuleService', ["$location", "$http", function($location, $http
 				url: '/api/modules/getModule/' + moduleId
 			})
 			.success(function(res){
-				console.log('Successful retrieval:', res)
+				// console.log('Successful retrieval:', res)
 				return res
 			})
 			.error(function(res){
@@ -275,7 +312,7 @@ entDev.factory('ModuleService', ["$location", "$http", function($location, $http
 				url: '/api/sections/getSection/' + _id
 			})
 			.success(function(res){
-				console.log('Successfully retrieved section:', res)
+				// console.log('Successfully retrieved section:', res)
 				return res
 			})
 			.error(function(res){
@@ -292,7 +329,7 @@ entDev.factory('ModuleService', ["$location", "$http", function($location, $http
 				}
 			})
 			.success(function(res){
-				console.log('Successfully retrieved section:', res)
+				// console.log('Successfully retrieved section:', res)
 				return res
 			})
 			.error(function(res){
@@ -410,8 +447,8 @@ entDev.controller('ImportController', ["$scope", "$location", "$routeParams", "$
 				})
 			}
 		}
-		console.log('dontInclude', dontInclude)
-		console.log('GOT MODULES:', res.data)
+		// console.log('dontInclude', dontInclude)
+		// console.log('GOT MODULES:', res.data)
 		for(var module = 0; module < res.data.length; module++){
 			if(res.data[module]._id != $routeParams._id){
 				for(var section = 0; section < res.data[module].sections.length; section++){
@@ -427,7 +464,7 @@ entDev.controller('ImportController', ["$scope", "$location", "$routeParams", "$
 	})
 	var getSections = function(){
 		ModuleService.getSections(sections).then(function(res){
-			console.log("GOT SECTIONS:", res.data)
+			// console.log("GOT SECTIONS:", res.data)
 			$scope.sections = res.data
 		})
 	}
@@ -439,7 +476,7 @@ entDev.controller('ImportController', ["$scope", "$location", "$routeParams", "$
 			}
 		})
 		sectionIds.push($routeParams._id)
-		console.log('sectionIds:', sectionIds)
+		// console.log('sectionIds:', sectionIds)
 		importSections(sectionIds)
 	}
 }])
@@ -455,8 +492,8 @@ entDev.factory('ImportService', ["$location", "$http", "$routeParams", function(
 			}
 		})
 		.success(function(res){
-			console.log('Successfully imported:', res)
-			console.log('GOING TO: #/module/' + $routeParams._id)
+			// console.log('Successfully imported:', res)
+			// console.log('GOING TO: #/module/' + $routeParams._id)
 			$location.path('/module/' + $routeParams._id)
 		})
 		.error(function(res){
