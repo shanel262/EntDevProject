@@ -118,17 +118,20 @@ entDev.factory('UsersService', ["$location", "$http", "$rootScope", "$window", f
 			data: user 
 		})
 		.success(function(res){
+			var payload = res.token.split('.')[1]
+			payload = window.atob(payload)
+			payload = JSON.parse(payload)
 			$rootScope.loggedInUser = {
-				id: res._id,
-				username: res.username,
-				name: res.name,
-				role: res.role
+				id: payload._id,
+				username: payload.username,
+				name: payload.name,
+				role: payload.role
 			}
 			// $rootScope.loggedInUser = res.username
 			console.log('loggedInUser:', $rootScope.loggedInUser)
-			$window.localStorage.setItem('id', res._id)
-			$window.localStorage.setItem('username', res.username)
-			$window.localStorage.setItem('role', res.role)
+			$window.localStorage.setItem('id', payload._id)
+			$window.localStorage.setItem('username', payload.username)
+			$window.localStorage.setItem('role', payload.role)
 			$rootScope.failed = false
 			$location.path('/home')
 		})
@@ -450,8 +453,6 @@ entDev.controller('ImportController', ["$scope", "$location", "$routeParams", "$
 				})
 			}
 		}
-		// console.log('dontInclude', dontInclude)
-		// console.log('GOT MODULES:', res.data)
 		for(var module = 0; module < res.data.length; module++){
 			if(res.data[module]._id != $routeParams._id){
 				for(var section = 0; section < res.data[module].sections.length; section++){
@@ -505,28 +506,90 @@ entDev.factory('ImportService', ["$location", "$http", "$routeParams", function(
 	}
 }])
 
-entDev.controller('EditStudentsController', ["$http", "$routeParams", function($http, $routeParams){
+entDev.controller('EditStudentsController', ["$scope", "$http", "$routeParams", "$rootScope", "ModuleService", "EditStudentsServices", function($scope, $http, $routeParams, $rootScope, ModuleService, EditStudentsServices){
 	$rootScope.loggedInUser = {
 		id: '58ef6387f853ef755eeefa15',
 		name: 'Shane Lacey',
 		username: 'shanel262',
 		role: 'Lecturer'
 	}
-	
-	$scope.modId = $routeParams._id
 
-	$http({
-		method: 'GET',
-		url: '/api/users/getAllStudents',
+	$scope.modId = $routeParams._id
+	ModuleService.getModuleTopics($scope.modId).then(function(res){
+		$http({
+			method: 'GET',
+			url: '/api/users/getAllStudents',
+		})
+		.success(function(students){
+			console.log('RES:', res)
+			if(res.data.students.length > 0){
+				students.forEach(function(student){
+					res.data.students.forEach(function(studentOnModule){
+						student.enrolled = false
+						if(student._id == studentOnModule){
+							student.enrolled = true
+						}
+					})
+				})
+				$scope.students = students
+			}
+			else{
+				students.forEach(function(student){
+					student.enrolled = false
+				})
+				$scope.students = students
+			}
+		})
+		.error(function(res){
+			console.log('Failed to find all students', res)
+		})		
 	})
-	.success(function(res){
-		$scope.students = res.data
-	})
-	.error(function(res){
-		console.log('Failed to find all students', res)
-	})
+
+	$scope.addStudent = function(studentId){
+		var student = {
+			studentId: studentId,
+			moduleId: $scope.modId
+		}
+		addStudent(student)
+	}
+
+	$scope.removeStudent = function(studentId){
+		var student = {
+			studentId: studentId,
+			moduleId: $scope.modId
+		}
+		removeStudent(student)
+	}
 }])
 
-entDev.factory('EditStudentsServices', [function(){
+entDev.factory('EditStudentsServices', ["$http", function($http){
+	addStudent = function(student){
+		$http({
+			method: 'POST',
+			url: '/api/modules/addStudent',
+			data: student
+		})
+		.success(function(res){
+			console.log('Successfully added student', res)
+			window.location.reload()
+		})
+		.error(function(res){
+			console.log('Failed to add student', res)
+		})
+	}
 
+	removeStudent = function(student){
+		$http({
+			method: 'POST',
+			url: '/api/modules/removeStudent',
+			data: student
+		})
+		.success(function(res){
+			console.log('Successfully removed student', res)
+		})
+		.error(function(res){
+			console.log('Failed to remove student', res)			
+		})
+
+	}
 }])

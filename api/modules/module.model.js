@@ -10,7 +10,7 @@ var ModuleSchema = new Schema({
 	name: { type: String, required: true },
 	sections: [SectionsSchema],
 	lecturer: {type: String, required: true},
-	students: [Number],
+	students: [String],
 	hidden: Boolean
 });
 

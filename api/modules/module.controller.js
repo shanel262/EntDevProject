@@ -93,3 +93,18 @@ exports.importSections = function(req, res){
 		}
 	})
 }
+
+exports.addStudent = function(req, res){
+	console.log('Add student to module:', req.body)
+	Module.findByIdAndUpdate(req.body.moduleId, {$push: {'students': req.body.studentId}}, function(err, student){
+		if(err){handleError(res, err)}
+		else{
+			console.log('Student added to module')
+			return res.status(200).json(student)
+		}
+	})
+}
+
+exports.removeStudent = function(req, res){
+	console.log('Remove student from module:', req.body)
+}

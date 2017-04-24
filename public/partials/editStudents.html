@@ -9,16 +9,20 @@
 					<b>Edit Students</b>
 				</div>	
 				<div class="panel-body">
-					<table class="table table-bordered">
+					<table class="table table-bordered table-striped">
 						<thead>
 							<td>Name</td>
 							<td>Username</td>
+							<td>Add/Remove</td>
 						</thead>
 						<tbody>
 							<tr ng-repeat="student in students">
-								<td>{{section.name}}</td>
-								<td>{{section.username}}</td>
-								<!-- <td><input type="checkbox" name="import" ng-model="import[section._id]" value="{{section._id}}"></td> -->
+								<td>{{student.name}}</td>
+								<td>{{student.username}}</td>
+								<td>
+									<button class="btn btn-success btn-xs" ng-if="student.enrolled == false" ng-click="addStudent(student._id)">Add</button>
+									<button class="btn btn-danger btn-xs" ng-if="student.enrolled == true" ng-click="removeStudent(student._id)">Remove</button>
+								</td>
 							</tr>
 						</tbody>
 					</table>
