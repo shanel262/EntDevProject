@@ -33,35 +33,53 @@ entDev.config(['$routeProvider',
 	}
 ])
 
-// .run(function($rootScope, $location){
-// 	$rootScope.$on('$routeChangeStart', function(event, nextRoute, currentRoute){
-// 		console.log('LOGGED IN USER:', $rootScope.loggedInUser)
-// 		console.log('NEXTROUTE:', $location.path())
-// 		// console.log('CURRENTROUTE:', currentRoute.$$route.originalPath)
-// 		if($rootScope.loggedInUser == null){
-// 			if($location.path() != '/register'){
-// 				if($location.path() != '/login'){
-// 					$location.path('/login')
-// 				}
-// 			}
-// 		}
-// 	})
-// })
+.run(function($rootScope, $location, UsersService){
+	$rootScope.$on('$routeChangeStart', function(event, nextRoute, currentRoute){
+		// console.log('LOGGED IN USER:', $rootScope.loggedInUser)
+		// console.log('NEXTROUTE:', $location.path())
+		// console.log('CURRENTROUTE:', currentRoute.$$route.originalPath)
+		var check = isLoggedIn()
+		if(check){
+			console.log('Continue', check)
+			if($location.path() == '/register'){
+				$location.path('/home')
+			}
+			else if($location.path() == '/login'){
+				$location.path('/home')
+			}
+		}
+		else{
+			console.log('No logged in user: Redirect')
+			if($location.path() != '/register'){
+				if($location.path() != '/login'){
+					$location.path('/login')
+				}
+			}
+		}
+	})
+})
 
 //Home
 entDev.controller('HomeController', ["$scope", "HomeService", "$rootScope", function($scope, HomeService, $rootScope){
-	$rootScope.loggedInUser = {
-		id: '58ef6387f853ef755eeefa15',
-		name: 'Shane Lacey',
-		username: 'shanel262',
-		role: 'Lecturer'
-	}
+	// $rootScope.loggedInUser = {
+	// 	id: '58ef6387f853ef755eeefa15',
+	// 	name: 'Shane Lacey',
+	// 	username: 'shanel262',
+	// 	role: 'Lecturer'
+	// }
 	$scope.modules = []
 	function getModules(){
 		if($rootScope.loggedInUser){
-			HomeService.getModules($rootScope.loggedInUser.id).then(function(res){
-				$scope.modules = res.data
-			})			
+			if($rootScope.loggedInUser.role == 'Lecturer'){
+				HomeService.getModulesLecturer($rootScope.loggedInUser.id).then(function(res){
+					$scope.modules = res.data
+				})							
+			}
+			else if($rootScope.loggedInUser.role == 'Student'){
+				HomeService.getModulesStudent($rootScope.loggedInUser.id).then(function(res){
+					$scope.modules = res.data
+				})							
+			}
 		}
 	}
 	getModules()
@@ -69,10 +87,24 @@ entDev.controller('HomeController', ["$scope", "HomeService", "$rootScope", func
 
 entDev.factory('HomeService', ["$location", "$http", function($location, $http){
 	return {
-		getModules: function(userId){
+		getModulesLecturer: function(userId){
 			return $http({
 				method: 'GET',
-				url: '/api/modules/getModules/' + userId
+				url: '/api/modules/getModulesLecturer/' + userId
+			})
+			.success(function(res){
+				// console.log('Successful retrieval;', res)
+				return res
+			})
+			.error(function(res){
+				console.log('Failed retrieval:', res)
+				return res
+			})
+		},
+		getModulesStudent: function(userId){
+			return $http({
+				method: 'GET',
+				url: '/api/modules/getModulesStudent/' + userId
 			})
 			.success(function(res){
 				// console.log('Successful retrieval;', res)
@@ -104,7 +136,7 @@ entDev.controller('UsersController', ["$scope", "UsersService", "$rootScope", "$
 		$window.localStorage.setItem('id', null)
 		$window.localStorage.setItem('username', null)
 		$window.localStorage.setItem('role', null)
-		$scope.$apply()
+		$window.localStorage.setItem('token', null)
 		$route.reload()
 	}
 }])
@@ -132,6 +164,7 @@ entDev.factory('UsersService', ["$location", "$http", "$rootScope", "$window", f
 			$window.localStorage.setItem('id', payload._id)
 			$window.localStorage.setItem('username', payload.username)
 			$window.localStorage.setItem('role', payload.role)
+			window.localStorage.setItem('token', res.token)
 			$rootScope.failed = false
 			$location.path('/home')
 		})
@@ -157,9 +190,31 @@ entDev.factory('UsersService', ["$location", "$http", "$rootScope", "$window", f
 			$rootScope.failed = true
 		})
 	}
-	// return {
-		
-	// }
+	isLoggedIn = function(){
+		var token = window.localStorage.getItem('token')
+		var payload
+		console.log('TOKEN:', token)
+		if(token != 'undefined' && token != 'null'){
+			payload = token.split('.')[1]
+			payload = window.atob(payload)
+			payload = JSON.parse(payload)
+			$rootScope.loggedInUser = {
+				id: payload._id,
+				name: payload.name,
+				username: payload.username,
+				role: payload.role
+			}
+			console.log('Valid token', $rootScope.loggedInUser)
+			return true
+		}
+		else{
+			console.log('NO TOKEN')
+			return false
+		}
+	}
+	return {
+		isLoggedIn: isLoggedIn
+	}
 }])
 
 //Add module
@@ -191,22 +246,24 @@ entDev.factory('AddModuleService', ["$location", "$http", function($location, $h
 			$rootScope.errorMsg = res
 		})
 	}
-	// return {
-
-	// }
 }])
 
 //Module
-entDev.controller('ModuleController', ["$scope", "ModuleService", "SectionService","$rootScope", "$routeParams", "$window", function($scope, ModuleService, SectionService,$rootScope, $routeParams, $window){
-	$rootScope.loggedInUser = {
-		id: '58ef6387f853ef755eeefa15',
-		name: 'Shane Lacey',
-		username: 'shanel262',
-		role: 'Lecturer'
-	}
+entDev.controller('ModuleController', ["$scope", "ModuleService", "SectionService", "$rootScope", "$routeParams", "$window", function($scope, ModuleService, SectionService, $rootScope, $routeParams, $window){
+	// $rootScope.loggedInUser = {
+	// 	id: '58ef6387f853ef755eeefa15',
+	// 	name: 'Shane Lacey',
+	// 	username: 'shanel262',
+	// 	role: 'Lecturer'
+	// }
 	$rootScope.failed = false
 	$scope.editSection = false
-	$scope.viewAsStudent = false
+	if($rootScope.loggedInUser.role == 'Lecturer'){
+		$scope.viewAsStudent = false
+	}
+	else if($rootScope.loggedInUser.role == 'Student'){
+		$scope.viewAsStudent = true
+	}
 	$scope.sections = []
 	ModuleService.getModuleTopics($routeParams._id).then(function(res){
 		$scope.name = res.data.name
@@ -251,11 +308,11 @@ entDev.controller('ModuleController', ["$scope", "ModuleService", "SectionServic
 		}
 	}
 	$scope.show = function(sectionId){
-		var section = { sectionId: sectionId}
+		var section = { sectionId: sectionId }
 		show(section)
 	}
 	$scope.hide = function(sectionId){
-		var section = { sectionId: sectionId}
+		var section = { sectionId: sectionId }
 		hide(section)
 	}
 	$scope.edit = function(){
@@ -433,12 +490,12 @@ entDev.factory('SectionService', ["$location", "$http", "$routeParams", "$window
 }])
 
 entDev.controller('ImportController', ["$scope", "$location", "$routeParams", "$rootScope", "HomeService", "ModuleService", "ImportService", function($scope, $location, $routeParams, $rootScope, HomeService, ModuleService, ImportService){
-	$rootScope.loggedInUser = {
-		id: '58ef6387f853ef755eeefa15',
-		name: 'Shane Lacey',
-		username: 'shanel262',
-		role: 'Lecturer'
-	}
+	// $rootScope.loggedInUser = {
+	// 	id: '58ef6387f853ef755eeefa15',
+	// 	name: 'Shane Lacey',
+	// 	username: 'shanel262',
+	// 	role: 'Lecturer'
+	// }
 	var dontInclude = []
 	var sections = []
 	$scope.import= {}
@@ -507,12 +564,12 @@ entDev.factory('ImportService', ["$location", "$http", "$routeParams", function(
 }])
 
 entDev.controller('EditStudentsController', ["$scope", "$http", "$routeParams", "$rootScope", "ModuleService", "EditStudentsServices", function($scope, $http, $routeParams, $rootScope, ModuleService, EditStudentsServices){
-	$rootScope.loggedInUser = {
-		id: '58ef6387f853ef755eeefa15',
-		name: 'Shane Lacey',
-		username: 'shanel262',
-		role: 'Lecturer'
-	}
+	// $rootScope.loggedInUser = {
+	// 	id: '58ef6387f853ef755eeefa15',
+	// 	name: 'Shane Lacey',
+	// 	username: 'shanel262',
+	// 	role: 'Lecturer'
+	// }
 
 	$scope.modId = $routeParams._id
 	ModuleService.getModuleTopics($scope.modId).then(function(res){
@@ -521,15 +578,16 @@ entDev.controller('EditStudentsController', ["$scope", "$http", "$routeParams", 
 			url: '/api/users/getAllStudents',
 		})
 		.success(function(students){
-			console.log('RES:', res)
 			if(res.data.students.length > 0){
 				students.forEach(function(student){
 					res.data.students.forEach(function(studentOnModule){
-						student.enrolled = false
 						if(student._id == studentOnModule){
 							student.enrolled = true
 						}
 					})
+					if(!student.enrolled){
+						student.enrolled = false
+					}
 				})
 				$scope.students = students
 			}
@@ -586,6 +644,7 @@ entDev.factory('EditStudentsServices', ["$http", function($http){
 		})
 		.success(function(res){
 			console.log('Successfully removed student', res)
+			window.location.reload()
 		})
 		.error(function(res){
 			console.log('Failed to remove student', res)			

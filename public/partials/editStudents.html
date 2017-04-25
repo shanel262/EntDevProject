@@ -9,6 +9,8 @@
 					<b>Edit Students</b>
 				</div>	
 				<div class="panel-body">
+					<input class="form-control" placeholder="Search" type="text" name="searchStudents" ng-model="searchStudents">
+					<br>
 					<table class="table table-bordered table-striped">
 						<thead>
 							<td>Name</td>
@@ -16,7 +18,7 @@
 							<td>Add/Remove</td>
 						</thead>
 						<tbody>
-							<tr ng-repeat="student in students">
+							<tr ng-repeat="student in students | filter:searchStudents">
 								<td>{{student.name}}</td>
 								<td>{{student.username}}</td>
 								<td>

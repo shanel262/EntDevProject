@@ -1,30 +1,36 @@
 <div class="container-fluid" ng-controller="ModuleController">
-	<div class="row" ng-if="viewAsStudent == false">
+	<div class="row" ng-if="viewAsStudent == false && loggedInUser.role == 'Lecturer'">
 		<div class="col-md-8 col-md-offset-2">
 			<div class="panel panel-default">
 				<div class="panel-heading" style="text-align: center;">
-					<h3>{{name}}</h3>
-					<a href="#/module/{{id}}/addSection" class="btn btn-success btn-sm">Add Section</a>
-					<a href="#/module/{{id}}/importSection" class="btn btn-success btn-sm">Import Section</a>
-					<a href="#/module/{{id}}/editStudents" class="btn btn-success btn-sm">Edit Students</a>
-					<a ng-click="edit()" ng-if="editSection == false" class="btn btn-default btn-sm">Edit</a>
-					<a ng-click="save()" ng-if="editSection == true" class="btn btn-default btn-sm">Save</a>
-					<a ng-click="changeView()" class="btn btn-default btn-sm">View as Student</a>
+					<h3 style="display: inline-block;">{{name}}</h3>
+					<div class="dropdown" style="display: inline-block;">
+						<button class="btn btn-default dropdown-toggle btn-sm" type="button" data-toggle="dropdown">Options <span class="caret"></span></button>
+						<ul class="dropdown-menu">
+							<li><a href="#/module/{{id}}/addSection">Add Section</a></li>
+							<li><a href="#/module/{{id}}/importSection">Import Section</a></li>
+							<li><a href="#/module/{{id}}/editStudents">Edit Students</a></li>
+							<li><a ng-click="changeView()">View as Student</a></li>
+							<li class="divider"></li>
+							<li><a ng-click="edit()" ng-if="editSection == false">Edit</a></li>
+							<li><a ng-click="save()" ng-if="editSection == true">Save</a></li>
+						</ul>
+					</div>
 				</div>
 				<div class="panel-body" ng-repeat="section in sections | orderBy:index">
-					<h3>{{section.name}}  {{section.index}}
-						<button class="btn btn-default btn-sm" ng-click="unlink(section._id)">Unlink</button>
-						<button class="btn btn-default btn-sm" ng-click="show(section._id)" ng-if="section.hidden == true">Show</button>
-						<button class="btn btn-default btn-sm" ng-click="hide(section._id)" ng-if="section.hidden == false">Hide</button>
-						<button class="btn btn-default btn-sm" ng-click="moveDown(section._id)">Move down</button>
-						<div class="dropdown">
-							<button class="btn btn-default dropdown-toggle btn-sm" type="button" data-toggle="dropdown">Move<span class="caret"></span></button>
-							<ul class="dropdown-menu">
-								<li ng-repeat="index in sectionsInModule"><a>{{index.index}}</a></li>
-							</ul>
-						</div>
-					</h3>
-					<label>{{section.description}} {{section._id}}</label>
+					<h3 style="display: inline-block;">{{section.name}}</h3> 
+					<h6 style="display: inline-block;">{{section._id}}  {{section.index}}</h6>
+					<div class="dropdown" style="display: inline-block;">
+						<button class="btn btn-default dropdown-toggle btn-sm" type="button" data-toggle="dropdown">Options <span class="caret"></span></button>
+						<ul class="dropdown-menu">
+							<li><a ng-click="unlink(section._id)">Unlink</a></li>
+							<li ng-if="section.hidden == true"><a ng-click="show(section._id)">Show</a></li>
+							<li ng-if="section.hidden == false"><a ng-click="hide(section._id)">Hide</a></li>
+							<li><a ng-click="moveDown(section._id)">Move down</a></li>
+						</ul>
+					</div>
+					<br>
+					<label>{{section.description}}</label>
 					<ol>
 						<li ng-repeat="content in section.content">
 							<a href="/api/sections/downloadFile/{{content._id}}" download="{{content.name}}">{{content.name}}</a>
@@ -33,7 +39,7 @@
 					</ol>
 
 					<form action="/api/sections/uploadFile" method="post" enctype="multipart/form-data"
-						style="border: thin solid lightgrey; background-color: lightgrey">
+						style="border: thin solid lightgrey; background-color: lightgrey" ng-if="editSection == true">
 						<input type="file" name="myFile" ng-model="aFile">
 						<br>
 						<input type="text" name="moduleId" ng-model="id" hidden>
@@ -49,17 +55,18 @@
 		</div>
 	</div>
 
-	<div class="row" ng-if="viewAsStudent == true">
+	<div class="row" ng-if="viewAsStudent == true && loggedInUser.role == 'Student'">
 		<div class="col-md-8 col-md-offset-2">
 			<div class="panel panel-default">
 				<div class="panel-heading" style="text-align: center;">
-					<h3>{{name}}</h3>
-					<a ng-click="changeView()" ng-if="loggedInUser.role == 'Lecturer'" class="btn btn-default btn-sm">View as Lecturer</a>
+					<h3 style="display: inline-block;">{{name}}</h3>
+					<a ng-click="changeView()" ng-if="loggedInUser.role == 'Lecturer'" class="btn btn-default btn-sm" style="display: inline-block;">View as Lecturer</a>
 				</div>
-				<div class="panel-body" ng-repeat="section in sections | orderBy:index">
-					<h3>{{section.name}}  {{section.index}}
-					</h3>
-					<label>{{section.description}} {{section._id}}</label>
+				<div class="panel-body" ng-repeat="section in sections | orderBy:index" ng-if="section.hidden == false">
+					<h3 style="display: inline-block;">{{section.name}}</h3> 
+					<h6 style="display: inline-block;">{{section._id}}  {{section.index}}</h6>
+					<br>
+					<label>{{section.description}}</label>
 					<ol>
 						<li ng-repeat="content in section.content">
 							<a href="/api/sections/downloadFile/{{content._id}}" download="{{content.name}}">{{content.name}}</a>

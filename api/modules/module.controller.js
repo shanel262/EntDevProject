@@ -6,9 +6,20 @@ function handleError(res, err) {
   return res.status(500).json(err);
 }
 
-exports.getModules = function(req, res){
+exports.getModulesLecturer = function(req, res){
 	console.log('getModules API:', req.params.userId)
 	Module.find({lecturer: req.params.userId}, function(err, modules){
+		if(err){handleError(res, err)}
+		else{
+			console.log('Found modules:', modules)
+			res.status(200).json(modules)
+		}
+	})
+}
+
+exports.getModulesStudent = function(req, res){
+	console.log('getModules API:', req.params.userId)
+	Module.find({students: req.params.userId}, function(err, modules){
 		if(err){handleError(res, err)}
 		else{
 			console.log('Found modules:', modules)
@@ -107,4 +118,11 @@ exports.addStudent = function(req, res){
 
 exports.removeStudent = function(req, res){
 	console.log('Remove student from module:', req.body)
+	Module.findByIdAndUpdate(req.body.moduleId, {$pull: {'students': req.body.studentId}}, function(err, student){
+		if(err){handleError(res, err)}
+		else{
+			console.log('Student removed from module')
+			return res.status(200).json(student)
+		}
+	})
 }

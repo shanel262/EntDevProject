@@ -4,23 +4,25 @@
 			<div class="btn-group pull-left" style="padding-top: 6px; padding-left: 5px">
 				<a href="#/module/{{modId}}" class="btn btn-sm btn-default">Back</a>
 			</div>
-
 			<div class="panel panel-primary">
 				<div class="panel-heading" style="text-align: center;">
 					<b>Import Section</b>
 				</div>	
 				<div class="panel-body">
-					<p>{{import}}</p>
+					<input class="form-control" placeholder="Search" type="text" name="searchSections" ng-model="searchSections">
+					<br>
 					<table class="table table-bordered">
 						<thead>
-							<td>Section Id</td>
-							<td>Section Name and Desc</td>
+							<td>Id</td>
+							<td>Name</td>
+							<td>Description</td>
 							<td>Import</td>
 						</thead>
 						<tbody>
-							<tr ng-repeat="section in sections">
+							<tr ng-repeat="section in sections | filter:searchSections">
 								<td>{{section._id}}</td>
-								<td>{{section.name}} <b>Desc:</b> {{section.description}}</td>
+								<td>{{section.name}}</td>
+								<td>{{section.description}}</td>
 								<td><input type="checkbox" name="import" ng-model="import[section._id]" value="{{section._id}}"></td>
 							</tr>
 						</tbody>
