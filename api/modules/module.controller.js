@@ -55,6 +55,17 @@ exports.addModule = function(req, res){
 	})
 }
 
+exports.deleteModule = function(req, res){
+	console.log('AT deleteModule API:', req.body)
+	Module.remove({_id: req.body.moduleId}, function(err, module){
+		if(err){handleError(res, err)}
+		else{
+			console.log('Deleted module')
+			res.status(200).json(module)
+		}
+	})
+}
+
 exports.addSection = function(req, res){
 	console.log('addSection API:', req.body)
 	var section = {

@@ -6,6 +6,7 @@ var router = express.Router();
 router.get('/getModulesLecturer/:userId', controller.getModulesLecturer); //Get modules for a user
 router.get('/getModulesStudent/:userId', controller.getModulesStudent); //Get modules for a user
 router.post('/addModule', controller.addModule) //Add a module
+router.post('/deleteModule', controller.deleteModule)
 router.get('/getModule/:moduleId', controller.getModule) //Get single module
 router.post('/addSection', controller.addSection)
 router.post('/deleteSection', controller.deleteSection)

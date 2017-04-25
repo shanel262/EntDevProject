@@ -341,11 +341,21 @@ entDev.controller('ModuleController', ["$scope", "ModuleService", "SectionServic
 	}
 	$scope.deleteSection = function(sectionId, moduleId){
 		console.log('DELETE:', sectionId, moduleId)
-		var section = {
-			sectionId: sectionId,
-			moduleId: moduleId
+		var confirm = $window.confirm('Are you sure?')
+		if(confirm){
+			var section = {
+				sectionId: sectionId,
+				moduleId: moduleId
+			}
+			deleteSection(section)			
 		}
-		deleteSection(section)
+	}
+	$scope.deleteModule = function(moduleId){
+		var confirm = $window.confirm('Are you sure?')
+		if(confirm){
+			var module = {moduleId: moduleId}
+			deleteModule(module)
+		}
 	}
 
 	$scope.moveDown = function(sectionId){
@@ -506,6 +516,20 @@ entDev.factory('SectionService', ["$location", "$http", "$routeParams", "$window
 		})
 		.error(function(res){
 			console.log('Failed to delete section:', res)
+		})
+	}
+	deleteModule = function(module){
+		$http({
+			method: 'POST',
+			url: '/api/modules/deleteModule',
+			data: module
+		})
+		.success(function(res){
+			console.log('Deleted module', res)
+			$location.path('/home')
+		})
+		.error(function(res){
+			console.log('Failed to delete module:', res)
 		})
 	}
 }])
