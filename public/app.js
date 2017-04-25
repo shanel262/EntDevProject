@@ -159,7 +159,6 @@ entDev.factory('UsersService', ["$location", "$http", "$rootScope", "$window", f
 				name: payload.name,
 				role: payload.role
 			}
-			// $rootScope.loggedInUser = res.username
 			console.log('loggedInUser:', $rootScope.loggedInUser)
 			$window.localStorage.setItem('id', payload._id)
 			$window.localStorage.setItem('username', payload.username)
@@ -340,6 +339,14 @@ entDev.controller('ModuleController', ["$scope", "ModuleService", "SectionServic
 			$scope.viewAsStudent = true
 		}
 	}
+	$scope.deleteSection = function(sectionId, moduleId){
+		console.log('DELETE:', sectionId, moduleId)
+		var section = {
+			sectionId: sectionId,
+			moduleId: moduleId
+		}
+		deleteSection(section)
+	}
 
 	$scope.moveDown = function(sectionId){
 		console.log('SECTIONID:', sectionId)
@@ -487,6 +494,20 @@ entDev.factory('SectionService', ["$location", "$http", "$routeParams", "$window
 		})
 		.error(function(res){console.log('Failed to change to hide', res)})
 	}
+	deleteSection = function(section){
+		$http({
+			method: 'POST',
+			url: '/api/modules/deleteSection',
+			data: section
+		})
+		.success(function(res){
+			console.log('Deleted section', res)
+			window.location.reload()
+		})
+		.error(function(res){
+			console.log('Failed to delete section:', res)
+		})
+	}
 }])
 
 entDev.controller('ImportController', ["$scope", "$location", "$routeParams", "$rootScope", "HomeService", "ModuleService", "ImportService", function($scope, $location, $routeParams, $rootScope, HomeService, ModuleService, ImportService){
@@ -500,7 +521,7 @@ entDev.controller('ImportController', ["$scope", "$location", "$routeParams", "$
 	var sections = []
 	$scope.import= {}
 	$scope.modId = $routeParams._id
-	HomeService.getModules($rootScope.loggedInUser.id)
+	HomeService.getModulesLecturer($rootScope.loggedInUser.id)
 	.then(function(res){
 		$scope.modules = res.data
 		for(var module = 0; module < res.data.length; module++){

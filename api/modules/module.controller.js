@@ -105,6 +105,17 @@ exports.importSections = function(req, res){
 	})
 }
 
+exports.deleteSection = function(req, res){
+	console.log('AT deleteSection API:', req.body)
+	Module.findByIdAndUpdate(req.body.moduleId, {$pull: {sections: {_id: req.body.sectionId}}}, function(err, section){
+		if(err){handleError(res, err)}
+		else{
+			console.log('Deleted section:', section)
+			return res.status(200).json(section)
+		}
+	})
+}
+
 exports.addStudent = function(req, res){
 	console.log('Add student to module:', req.body)
 	Module.findByIdAndUpdate(req.body.moduleId, {$push: {'students': req.body.studentId}}, function(err, student){
